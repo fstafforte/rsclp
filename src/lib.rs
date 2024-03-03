@@ -384,7 +384,7 @@ impl PartialEq for CommandLineOption {
 ///     let config_option = clp.add_string_option('c', "config", true, "file path", "configuration file path").unwrap();
 ///     match clp.parse_args(std::env::args()) {
 ///         Ok(()) => {
-///         let config_file: String = clp.get_value(config_option).unwrap();
+///         let config_file: String = clp.get_value(&config_option).unwrap();
 ///         println!("config_file: {}", config_file);
 ///         },
 ///         Err(parse_error) => {
@@ -922,10 +922,10 @@ impl CommandLineParser {
     /// is not set error is returned
     /// * `option_hash` - command line option identifier returned by
     /// an add_* method 
-    pub fn get_value<T: FromStr + 'static>(&self, option_hash: u64) -> StdResult<T, CommandLineParserError> {
+    pub fn get_value<T: FromStr + 'static>(&self, option_hash: &u64) -> StdResult<T, CommandLineParserError> {
         let mut iter = self.options.iter();
         while let Some(option) = iter.next() {
-            if option_hash == option.calculate_hash() {
+            if *option_hash == option.calculate_hash() {
                 let option_value = option.get_value();
                 if let Some(value) = option_value {
                     if let Ok(parsed_value) = value.parse::<T>() {
@@ -965,10 +965,10 @@ impl CommandLineParser {
     /// is not set error is returned
     /// * `option_hash` - command line option identifier returned by
     /// an add_* method 
-    pub fn get_values<T: FromStr>(&self, option_hash: u64) -> Option<Vec<T>> {
+    pub fn get_values<T: FromStr>(&self, option_hash: &u64) -> Option<Vec<T>> {
         let mut values: Vec<T> = vec![];
         for option in &self.options {
-            if option_hash == option.calculate_hash() {
+            if *option_hash == option.calculate_hash() {
                 let option_values = option.get_values();
                 for option_value in option_values {
                     if let Ok(parsed_value) = option_value.parse::<T>() {
@@ -1487,7 +1487,7 @@ mod tests {
         let _ = clp.add_short_string_option('c', false, "file path", "configuration file path").unwrap();
         let args = vec!["test_sho_help".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        let value = clp.get_value::<i32>(verbosity);
+        let value = clp.get_value::<i32>(&verbosity);
         assert_eq!("IntegerCommandLineOptionType -V/--verbose: is not set".to_string(), value.unwrap_err().to_string());
     }
 
@@ -1500,7 +1500,7 @@ mod tests {
         let _ = clp.add_short_string_option('c', false, "file path", "configuration file path").unwrap();
         let args = vec!["test_sho_help".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        let value = clp.get_value::<i32>(1u64);
+        let value = clp.get_value::<i32>(&1u64);
         assert_eq!("UndefinedCommandLineOptionType : option identifier not found".to_string(), value.unwrap_err().to_string());
     }
 
@@ -1513,9 +1513,9 @@ mod tests {
         let _ = clp.add_short_string_option('c', false, "file path", "configuration file path").unwrap();
         let args = vec!["test_sho_help".to_string(), "-V".to_string(), "-12".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        let value = clp.get_value::<f32>(verbosity);
+        let value = clp.get_value::<f32>(&verbosity);
         assert_eq!("IntegerCommandLineOptionType -V/--verbose: is not of the required type".to_string(), value.unwrap_err().to_string());
-        let value = clp.get_value::<i8>(verbosity);
+        let value = clp.get_value::<i8>(&verbosity);
         assert_eq!(-12, value.unwrap());         
     }
 
@@ -1555,7 +1555,7 @@ mod tests {
         let args = vec!["test_boolean_option_eq".to_string(), "-v=false".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
         assert_eq!(true, clp.is_set(&version_option));
-        assert_eq!(Ok(false), clp.get_value::<bool>(version_option));
+        assert_eq!(Ok(false), clp.get_value::<bool>(&version_option));
     }
     #[test]
     fn test_boolean_option_arg_already_assigned() {
@@ -1573,7 +1573,7 @@ mod tests {
         let config_option = clp.add_long_string_option("config", false, "file path", "application configuration file").unwrap();
         let args = vec!["test_long_form_option".to_string(), "--config=goofy.properties".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        assert_eq!(String::from("goofy.properties"), clp.get_value::<String>(config_option).unwrap());
+        assert_eq!(String::from("goofy.properties"), clp.get_value::<String>(&config_option).unwrap());
     }
 
     #[test]
@@ -1582,7 +1582,7 @@ mod tests {
         let help_option = clp.add_help_option("show this help").unwrap();
         let args = vec!["test_boolean_long_form_option".to_string(), "--help=false".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        assert_eq!(Ok(false), clp.get_value::<bool>(help_option));
+        assert_eq!(Ok(false), clp.get_value::<bool>(&help_option));
     }
 
     #[test]
@@ -1601,7 +1601,7 @@ mod tests {
                                     ];   
         assert_eq!(Ok(()), clp.parse(&args));
         assert_eq!(true, clp.is_set(&config_option));
-        let values: Vec<String> = clp.get_values(config_option).unwrap();
+        let values: Vec<String> = clp.get_values(&config_option).unwrap();
         assert_eq!(vec!["config1.properties".to_string(), 
                         "config2.properties".to_string(),
                         "config3.properties".to_string()],
