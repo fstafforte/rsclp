@@ -1,10 +1,10 @@
 # rsclp
 Command line parser rust lib crate
 
-<p>
-Command line parser is able to parse process arguments.</p>
-<p>Arguments could be of two types, single character argument (i.g -c)
-or long text argument (i.g. --config-file)</p>
+
+Command line parser is able to parse process arguments.</br>
+Arguments could be of two types, single character argument (i.g -c)
+or long text argument (i.g. --config-file)</br>
 #### Process argument could be of the following type:
  - Boolean: classic is -h to show process help.
  - Integer: an integer value for example verbosity level --verbose 5. 
