@@ -25,5 +25,5 @@ adding **=** and the value **(i.g. -xvzf=file_to_compress.tar.gz)** or as next p
 **(i.g -xvzf file_to_compress.tar.gz)**.
 **NOTE:** No more than a single character option with a mandatory argument can be grouped.
 
-**[documentation](docs.rs/rsclp/0.1.0)**
+**[documentation](https://docs.rs/rsclp/0.1.0/rsclp/)**
 
