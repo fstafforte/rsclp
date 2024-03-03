@@ -1,6 +1,6 @@
 [package]
 name = "rsclp"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "A lib crate to parse proccess arguments"
 repository = "https://github.com/fstafforte/rsclp"
