@@ -906,10 +906,10 @@ impl CommandLineParser {
     /// during command line parsing phase
     /// * `option_hash` - command line option identifier returned by
     /// an add_* method 
-    pub fn is_set(&self, option_hash: u64) ->  bool {
+    pub fn is_set(&self, option_hash: &u64) ->  bool {
         let mut iter = self.options.iter();
         while let Some(option) = iter.next() {
-            if option_hash == option.calculate_hash() {
+            if *option_hash == option.calculate_hash() {
                 return option.is_set();
             }
         }
@@ -1422,7 +1422,7 @@ mod tests {
         let config_option = clp.add_string_option('c', "config", false, "file path", "application configuration file").unwrap();
         let args = vec!["is_not_set".to_string()];
         assert_eq!(Ok(()), clp.parse(&args));
-        assert_eq!(false, clp.is_set(config_option));
+        assert_eq!(false, clp.is_set(&config_option));
     }
 
     #[test]
@@ -1554,7 +1554,7 @@ mod tests {
         let version_option = clp.add_version_option("print-out application version").unwrap();
         let args = vec!["test_boolean_option_eq".to_string(), "-v=false".to_string()];        
         assert_eq!(Ok(()), clp.parse(&args));
-        assert_eq!(true, clp.is_set(version_option));
+        assert_eq!(true, clp.is_set(&version_option));
         assert_eq!(Ok(false), clp.get_value::<bool>(version_option));
     }
     #[test]
@@ -1600,7 +1600,7 @@ mod tests {
                                     "config3.properties".to_string(),
                                     ];   
         assert_eq!(Ok(()), clp.parse(&args));
-        assert_eq!(true, clp.is_set(config_option));
+        assert_eq!(true, clp.is_set(&config_option));
         let values: Vec<String> = clp.get_values(config_option).unwrap();
         assert_eq!(vec!["config1.properties".to_string(), 
                         "config2.properties".to_string(),
