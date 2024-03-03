@@ -1099,14 +1099,12 @@ impl CommandLineParser {
             idx = idx + 1;
         }
 
-        self.check_mandatory_options()?;
-
         Ok(())
     }
 
     // Method to check if mandatory options
     // has at least a value set
-    fn check_mandatory_options(&self) -> StdResult<(), CommandLineParserError> {
+    pub fn check_mandatory_options(&self) -> StdResult<(), CommandLineParserError> {
         let mut iter = self.options.iter();
         while let Some(option) = iter.next() {
             if option.mandatory &&  !option.is_set() {
@@ -1430,8 +1428,9 @@ mod tests {
         let mut clp = CommandLineParser::new(None);
         let _ = clp.add_string_option('c', "config", true, "file path", "application configuration file").unwrap();
         let args = vec!["is_not_set".to_string()];
+        assert_eq!(Ok(()), clp.parse(&args));
         assert_eq!("StringCommandLineOptionType -c/--config: mandatory option has not been set".to_string(), 
-                    clp.parse(&args).unwrap_err().to_string());
+            clp.check_mandatory_options().unwrap_err().to_string());
     }
 
     #[test]

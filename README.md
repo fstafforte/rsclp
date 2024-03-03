@@ -27,3 +27,7 @@ adding **=** and the value **(i.g. -xvzf=file_to_compress.tar.gz)** or as next p
 
 **[documentation](https://docs.rs/rsclp/0.1.0/rsclp/)**
 
+## New Features and bugs resolution
+
+2024-March-03 - Bug description: mandatory options are checked even if help option or version is set.
+> **Solution**: method check_mandatory_options is not private anymore and the user can callit after the help or version option check 
