@@ -31,3 +31,6 @@ adding **=** and the value **(i.g. -xvzf=file_to_compress.tar.gz)** or as next p
 
 2024-March-03 - Bug description: mandatory options are checked even if help option or version is set.
 > **Solution**: method check_mandatory_options is not private anymore and the user can callit after the help or version option check 
+
+2024-March-07 Bug, wrong management of -- (dashdash) option when prsing mode is set to ParsingMode::DefaultParsingMode solved 
+

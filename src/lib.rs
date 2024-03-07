@@ -384,8 +384,10 @@ impl PartialEq for CommandLineOption {
 ///     let config_option = clp.add_string_option('c', "config", true, "file path", "configuration file path").unwrap();
 ///     match clp.parse_args(std::env::args()) {
 ///         Ok(()) => {
-///         let config_file: String = clp.get_value(&config_option).unwrap();
-///         println!("config_file: {}", config_file);
+///             let config_file: String = clp.get_value(&config_option).unwrap_or_else(|e| {
+///                 eprintln!("{}", e);
+///                 String::from("") });
+///             println!("config_file: {}", config_file);
 ///         },
 ///         Err(parse_error) => {
 ///             eprintln!("{}", parse_error);
@@ -1208,16 +1210,19 @@ impl CommandLineParser {
     // * `idx` - mutable  process argument index
     fn parse_long_form_option(&mut self, args: &Vec<String>, arg: &String, idx: &mut usize, dashdash: &mut bool) -> StdResult<(), CommandLineParserError> {
         let args_len = args.len();
-        if 2 == arg.len() {
+        if arg == "--" {
             if self.parsing_mode == ParsingMode::PositionalArgumentsMode {
                 *dashdash = true;
+                return Ok(());
             }
-            return Ok(());
         }
         
         let mut opt_and_arg: Vec<String> = arg.splitn(2, OPTION_ASSIGN_TAG)
                                             .map(|x| x.to_string()).collect();
-        let opt = opt_and_arg.get(0).unwrap();
+        let opt = opt_and_arg.get_mut(0).unwrap();
+        if opt == "--" {
+            opt.push_str("--");
+        }
         if let Some(option) = self.get_option_mut(opt) {
             let mut opt_arg;
             if opt_and_arg.len() < 2 {
@@ -1669,4 +1674,16 @@ mod tests {
         println!("positional_args: {:#?}", positional_args);
     }
 
+    #[test]
+    fn dashdash_default_parse_mode() {
+        let mut clp = CommandLineParser::new(None);
+        let dashdash_option = clp.add_string_option('-', "--", false, "file path", "remove file starting with -").unwrap();
+        let args = vec!["test_get_values".to_string(), 
+                                    "--".to_string(),
+                                    "-".to_string()
+        ];
+        assert_eq!(Ok(()), clp.parse(&args));
+        assert_eq!(true, clp.is_set(&dashdash_option));
+        assert_eq!("-".to_string(), clp.get_value::<String>(&dashdash_option).unwrap())
+    }
 }
