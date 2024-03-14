@@ -1146,7 +1146,6 @@ impl CommandLineParser {
             if let Some(option) = self.get_option_mut(&opt) {
                 if option.typ.unwrap() == COMMAND_LINE_OPTION_TYPE_BOOLEAN {
                     let mut value = "true";
-                    println!("pos: {}, char_idx: {}", pos, char_idx);
                     if !opt_arg.is_empty() {
                         if !opt_arg_assigned {
                             value = &opt_arg;
